@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Nexus-Flow · Live Fleet Intelligence</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Barlow:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --cyan: #00e5ff;
+        --amber: #ff8c42;
+        --green: #00ff9f;
+        --red: #ff4b6e;
+        --bg: #040d1a;
+        --bg2: #071426;
+        --bg3: #0a1e38;
+        --text: #e0f0ff;
+        --muted: #5a8ab0;
+        --border: rgba(0, 229, 255, 0.15);
+        --border2: rgba(0, 229, 255, 0.08);
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Barlow", sans-serif;
+        overflow-x: hidden;
+      }
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.2rem 3rem;
+        border-bottom: 1px solid var(--border2);
+        backdrop-filter: blur(20px);
+        background: rgba(4, 13, 26, 0.9);
+      }
+      .logo {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.6rem;
+        letter-spacing: 0.15em;
+        color: var(--cyan);
+        text-decoration: none;
+      }
+      .logo span {
+        color: var(--amber);
+      }
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: color 0.3s;
+        cursor: pointer;
+      }
+      .nav-links a:hover {
+        color: var(--cyan);
+      }
+      .connection-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+      .status-online {
+        background: var(--green);
+      }
+      .status-offline {
+        background: var(--red);
+      }
+      #hero {
+        padding: 8rem 3rem 4rem;
+        background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
+      }
+      .hero-content {
+        max-width: 900px;
+      }
+      h1 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(3rem, 7vw, 5rem);
+        line-height: 0.95;
+        letter-spacing: 0.02em;
+        margin-bottom: 1rem;
+      }
+      h1 span {
+        color: var(--cyan);
+      }
+      .hero-sub {
+        font-size: 1.05rem;
+        color: var(--muted);
+        font-weight: 300;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+      }
+      #dashboard {
+        padding: 3rem;
+        max-width: 1800px;
+        margin: 0 auto;
+      }
+      .dash-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+      .section-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--cyan);
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+      }
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 3rem;
+      }
+      .kpi-card {
+        background: var(--bg2);
+        border: 1px solid var(--border2);
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .kpi-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 0.8rem;
+      }
+      .kpi-val {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2.8rem;
+        line-height: 1;
+        color: var(--cyan);
+      }
+      .kpi-val.warn {
+        color: var(--amber);
+      }
+      .kpi-val.danger {
+        color: var(--red);
+      }
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+      .map-panel,
+      .ships-panel {
+        background: var(--bg2);
+        border: 1px solid var(--border2);
+        padding: 1.5rem;
+      }
+      .panel-title {
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--border2);
+      }
+      #mapCanvas {
+        width: 100%;
+        height: 420px;
+        border: 1px solid var(--border2);
+        background: #040d1a;
+      }
+      .map-legend {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+        font-family: "Space Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        flex-wrap: wrap;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .legend-dot {
+        width: 10px;
+        height: 2px;
+      }
+      .ship-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.85rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid var(--border2);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .ship-row:hover {
+        background: rgba(0, 229, 255, 0.05);
+        border-color: var(--cyan);
+      }
+      .ship-row.selected {
+        background: rgba(0, 229, 255, 0.1);
+        border-color: var(--cyan);
+      }
+      .ship-score {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Space Mono", monospace;
+        font-size: 0.9rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .score-crit {
+        background: rgba(255, 75, 110, 0.12);
+        border: 2px solid rgba(255, 75, 110, 0.6);
+        color: var(--red);
+      }
+      .score-warn {
+        background: rgba(255, 140, 66, 0.12);
+        border: 2px solid rgba(255, 140, 66, 0.6);
+        color: var(--amber);
+      }
+      .score-ok {
+        background: rgba(0, 255, 159, 0.12);
+        border: 2px solid rgba(0, 255, 159, 0.6);
+        color: var(--green);
+      }
+      .ship-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .ship-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+      .ship-cargo {
+        font-family: "Space Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        margin-bottom: 0.3rem;
+      }
+      .ship-meta {
+        font-family: "Space Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--muted);
+      }
+      .alert-badge {
+        font-family: "Space Mono", monospace;
+        font-size: 0.6rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .badge-crit {
+        background: rgba(255, 75, 110, 0.2);
+        color: var(--red);
+        border: 1px solid rgba(255, 75, 110, 0.4);
+      }
+      .badge-warn {
+        background: rgba(255, 140, 66, 0.2);
+        color: var(--amber);
+        border: 1px solid rgba(255, 140, 66, 0.4);
+      }
+      .badge-ok {
+        background: rgba(0, 255, 159, 0.2);
+        color: var(--green);
+        border: 1px solid rgba(0, 255, 159, 0.4);
+      }
+      .detail-panel {
+        background: var(--bg2);
+        border: 1px solid var(--border2);
+        padding: 1.5rem;
+        display: none;
+      }
+      .detail-panel.active {
+        display: block;
+      }
+      .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .detail-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2rem;
+        color: var(--text);
+      }
+      .detail-id {
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        margin-top: 0.3rem;
+      }
+      .btn {
+        padding: 0.6rem 1.5rem;
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .btn-analyze {
+        background: var(--cyan);
+        color: var(--bg);
+        margin-right: 0.5rem;
+      }
+      .btn-analyze:hover {
+        background: #fff;
+      }
+      .btn-storm {
+        background: var(--red);
+        color: #fff;
+      }
+      .btn-storm:hover {
+        background: #ff6b85;
+      }
+      .btn-accept {
+        background: var(--green);
+        color: var(--bg);
+        margin-top: 1rem;
+      }
+      .risk-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .risk-item {
+        background: var(--bg);
+        border: 1px solid var(--border2);
+        padding: 1rem;
+      }
+      .risk-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+      }
+      .risk-value {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.8rem;
+        color: var(--text);
+      }
+      .risk-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+      }
+      .risk-bar-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+      }
+      .reroutes-section {
+        margin-top: 2rem;
+      }
+      .reroute-card {
+        background: var(--bg);
+        border: 1px solid var(--border2);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+      }
+      .reroute-card.recommended {
+        border-color: var(--cyan);
+        background: rgba(0, 229, 255, 0.05);
+      }
+      .reroute-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+      .reroute-title {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      .reroute-badge {
+        font-family: "Space Mono", monospace;
+        font-size: 0.6rem;
+        padding: 0.25rem 0.6rem;
+        background: rgba(0, 229, 255, 0.15);
+        color: var(--cyan);
+        border-radius: 3px;
+        text-transform: uppercase;
+      }
+      .reroute-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+      .metric {
+        text-align: center;
+      }
+      .metric-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--muted);
+        margin-bottom: 0.3rem;
+      }
+      .metric-value {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.5rem;
+      }
+      .metric-value.positive {
+        color: var(--green);
+      }
+      .metric-value.negative {
+        color: var(--red);
+      }
+      .loading {
+        text-align: center;
+        padding: 2rem;
+        color: var(--muted);
+        font-family: "Space Mono", monospace;
+        font-size: 0.8rem;
+      }
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border);
+        border-top-color: var(--cyan);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (max-width: 800px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+        nav {
+          padding: 1rem;
+        }
+        #dashboard {
+          padding: 1.5rem;
+        }
+        #hero {
+          padding: 6rem 1.5rem 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="logo" href="#">NEXUS<span>·</span>FLOW</a>
+      <ul class="nav-links">
+        <li><a href="#dashboard">Dashboard</a></li>
+        <li><a onclick="refreshData(false)">Refresh</a></li>
+      </ul>
+      <div class="connection-status">
+        <span class="status-dot status-offline" id="statusDot"></span>
+        <span id="statusText">CONNECTING</span>
+      </div>
+    </nav>
+
+    <section id="hero">
+      <div class="hero-content">
+        <h1>LIVE FLEET<span> COMMAND</span></h1>
+        <p class="hero-sub">
+          Real-time disruption monitoring across the Shenzhen–Long Beach
+          corridor with AI-powered risk analysis and automated rerouting.
+        </p>
+      </div>
+    </section>
+
+    <section id="dashboard">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Active Vessels</div>
+          <div class="kpi-val" id="kpi-total">-</div>
+          <div class="kpi-delta">Trans-Pacific Fleet</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Critical Alerts</div>
+          <div class="kpi-val danger" id="kpi-critical">-</div>
+          <div class="kpi-delta">Require action</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Warning Status</div>
+          <div class="kpi-val warn" id="kpi-warning">-</div>
+          <div class="kpi-delta">Under watch</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Normal Status</div>
+          <div class="kpi-val" id="kpi-normal">-</div>
+          <div class="kpi-delta">On track</div>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div class="map-panel">
+          <div class="panel-title">Live Route Map — Pacific Corridor</div>
+          <canvas
+            id="mapCanvas"
+            width="800"
+            height="420"
+            style="width: 100%; height: auto; background: #040d1a"
+          ></canvas>
+          <div class="map-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--green)"></span
+              >Active Route
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--amber)"></span
+              >Warning Zone
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--red)"></span
+              >Critical Alert
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--cyan)"></span
+              >Reroute Option
+            </div>
+          </div>
+        </div>
+        <div class="ships-panel">
+          <div class="panel-title">Fleet Status — Click for Details</div>
+          <div id="shipsList">
+            <div class="loading">
+              <span class="spinner"></span> Loading fleet data...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+          <div>
+            <div class="detail-title" id="detailName">-</div>
+            <div class="detail-id" id="detailId">-</div>
+          </div>
+          <div>
+            <button class="btn btn-analyze" onclick="analyzeShipment()">
+              Run Analysis</button
+            ><button class="btn btn-storm" onclick="triggerStorm()">
+              Trigger Storm
+            </button>
+          </div>
+        </div>
+        <div id="detailContent">
+          <div class="loading">Select a vessel to view details</div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const API_BASE = "http://localhost:8000";
+      let globalShipments = [];
+      let selectedShipId = null;
+      let cachedAnalysis = {}; // { shipmentId: { data, timestamp } }
+      let mapAnimationId = null;
+
+      // helpers
+      function updateConnectionStatus(online) {
+        const dot = document.getElementById("statusDot");
+        const text = document.getElementById("statusText");
+        if (online) {
+          dot.className = "status-dot status-online";
+          text.textContent = "ONLINE";
+        } else {
+          dot.className = "status-dot status-offline";
+          text.textContent = "OFFLINE";
+        }
+      }
+
+      function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function (m) {
+          if (m === "&") return "&amp;";
+          if (m === "<") return "&lt;";
+          if (m === ">") return "&gt;";
+          return m;
+        });
+      }
+
+      // fetch KPI summary from /dashboard/summary
+      async function fetchDashboardSummary() {
+        try {
+          const res = await fetch(`${API_BASE}/dashboard/summary`);
+          if (!res.ok) throw new Error("Dashboard summary failed");
+          const data = await res.json();
+          const summary = data.fleet_summary || {};
+          document.getElementById("kpi-total").textContent =
+            summary.total_shipments ?? 0;
+          document.getElementById("kpi-critical").textContent =
+            summary.critical ?? 0;
+          document.getElementById("kpi-warning").textContent =
+            summary.warning ?? 0;
+          document.getElementById("kpi-normal").textContent =
+            summary.normal ?? 0;
+          updateConnectionStatus(true);
+          return data;
+        } catch (err) {
+          console.warn("Dashboard summary error:", err);
+          updateConnectionStatus(false);
+          return null;
+        }
+      }
+
+      // fetch shipments from /shipments/ (fields: id, vessel_name, cargo, disruption_score, eta, origin, destination, current_position)
+      async function fetchShipments() {
+        try {
+          const res = await fetch(`${API_BASE}/shipments/`);
+          if (!res.ok) throw new Error("Shipments fetch failed");
+          const data = await res.json();
+          globalShipments = data.shipments || [];
+          renderShipmentsList(globalShipments);
+          drawMap(globalShipments);
+          return globalShipments;
+        } catch (err) {
+          console.error("Shipments error:", err);
+          document.getElementById("shipsList").innerHTML =
+            '<div class="loading" style="color:var(--red)">⚠ Failed to load fleet data. Is the backend running?</div>';
+          updateConnectionStatus(false);
+          return [];
+        }
+      }
+
+      function renderShipmentsList(ships) {
+        const container = document.getElementById("shipsList");
+        if (!ships.length) {
+          container.innerHTML =
+            '<div class="loading">No active shipments</div>';
+          return;
+        }
+        container.innerHTML = ships
+          .map((ship) => {
+            const score = ship.disruption_score ?? 0;
+            let scoreClass = "score-ok",
+              badgeClass = "badge-ok",
+              badgeText = "NORMAL";
+            if (score >= 70) {
+              scoreClass = "score-crit";
+              badgeClass = "badge-crit";
+              badgeText = "CRITICAL";
+            } else if (score >= 50) {
+              scoreClass = "score-warn";
+              badgeClass = "badge-warn";
+              badgeText = "WARNING";
+            }
+            const etaShort = ship.eta
+              ? new Date(ship.eta).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })
+              : "TBD";
+            const cargoDisplay =
+              ship.cargo || ship.cargo_type || "General cargo";
+            return `
+        <div class="ship-row ${selectedShipId === ship.id ? "selected" : ""}" onclick="selectShip('${ship.id}')">
+          <div class="ship-score ${scoreClass}">${Math.round(score)}</div>
+          <div class="ship-info">
+            <div class="ship-name">${escapeHtml(ship.vessel_name)}</div>
+            <div class="ship-cargo">${escapeHtml(cargoDisplay)} · ${ship.id}</div>
+            <div class="ship-meta">ETA: ${etaShort} · ${ship.origin || "Shenzhen"} → ${ship.destination || "Long Beach"}</div>
+          </div>
+          <div class="alert-badge ${badgeClass}">${badgeText}</div>
+        </div>`;
+          })
+          .join("");
+      }
+
+      // select shipment and show either cached analysis or basic info
+      window.selectShip = function (id) {
+        selectedShipId = id;
+        const ship = globalShipments.find((s) => s.id === id);
+        if (!ship) return;
+        renderShipmentsList(globalShipments);
+        const panel = document.getElementById("detailPanel");
+        panel.classList.add("active");
+        document.getElementById("detailName").textContent = ship.vessel_name;
+        document.getElementById("detailId").textContent = ship.id;
+
+        // check for valid cached analysis (less than 10 minutes old)
+        const cached = cachedAnalysis[id];
+        const now = Date.now();
+        if (cached && now - cached.timestamp < 10 * 60 * 1000) {
+          renderAnalysisResult(cached.data);
+        } else {
+          // show basic info with call to action
+          const score = ship.disruption_score ?? 0;
+          document.getElementById("detailContent").innerHTML = `
+        <div class="risk-grid">
+          <div class="risk-item"><div class="risk-label">Overall Risk Score</div>
+            <div class="risk-value" style="color:${score >= 70 ? "var(--red)" : score >= 50 ? "var(--amber)" : "var(--green)"}">${Math.round(score)}</div>
+            <div class="risk-bar"><div class="risk-bar-fill" style="width:${score}%;background:${score >= 70 ? "var(--red)" : score >= 50 ? "var(--amber)" : "var(--green)"}"></div></div>
+          </div>
+          <div class="risk-item"><div class="risk-label">Cargo</div><div class="risk-value" style="font-size:1.2rem">${escapeHtml(ship.cargo || ship.cargo_type || "Container")}</div></div>
+          <div class="risk-item"><div class="risk-label">Route</div><div class="risk-value" style="font-size:1rem">${ship.origin || "Shenzhen"} → ${ship.destination || "Long Beach"}</div></div>
+          <div class="risk-item"><div class="risk-label">ETA</div><div class="risk-value" style="font-size:1.2rem">${ship.eta ? new Date(ship.eta).toLocaleDateString() : "TBD"}</div></div>
+        </div>
+        <div style="margin-top:1.5rem;padding:1rem;background:var(--bg);border:1px solid var(--border2);border-radius:4px">
+          <p style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted)">
+            Click <strong style="color:var(--cyan)">Run Analysis</strong> to fetch real-time risk breakdown.<br>
+            Use <strong style="color:var(--red)">Trigger Storm</strong> to simulate critical weather event + reroute options.
+          </p>
+        </div>`;
+        }
+      };
+
+      // API call: analyze shipment (POST)
+      window.analyzeShipment = async function () {
+        if (!selectedShipId) return;
+        document.getElementById("detailContent").innerHTML =
+          '<div class="loading"><span class="spinner"></span> Running AI risk analysis...</div>';
+        try {
+          const res = await fetch(
+            `${API_BASE}/shipments/${selectedShipId}/analyze`,
+            { method: "POST" },
+          );
+          if (!res.ok) throw new Error("Analysis failed");
+          const data = await res.json();
+          // store in cache
+          cachedAnalysis[selectedShipId] = {
+            data: data,
+            timestamp: Date.now(),
+          };
+          renderAnalysisResult(data);
+          // refresh shipments list to update disruption_score display
+          await fetchShipments();
+          // re-apply selected highlight and restore analysis view (no flicker)
+          if (selectedShipId) {
+            renderShipmentsList(globalShipments);
+            renderAnalysisResult(data); // ensure detail panel stays
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("detailContent").innerHTML =
+            '<div class="loading" style="color:var(--red)">Analysis failed. Check backend logs.</div>';
+        }
+      };
+
+      window.triggerStorm = async function () {
+        if (!selectedShipId) return;
+        document.getElementById("detailContent").innerHTML =
+          '<div class="loading"><span class="spinner"></span> Storm simulation in progress...</div>';
+        try {
+          const res = await fetch(
+            `${API_BASE}/shipments/${selectedShipId}/analyze?trigger_storm=true`,
+            { method: "POST" },
+          );
+          if (!res.ok) throw new Error("Storm trigger failed");
+          const data = await res.json();
+          cachedAnalysis[selectedShipId] = {
+            data: data,
+            timestamp: Date.now(),
+          };
+          renderAnalysisResult(data);
+          await fetchShipments();
+          if (selectedShipId) {
+            renderShipmentsList(globalShipments);
+            renderAnalysisResult(data);
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("detailContent").innerHTML =
+            '<div class="loading" style="color:var(--red)">Storm simulation error.</div>';
+        }
+      };
+
+      function renderAnalysisResult(data) {
+        const breakdown = data.risk_breakdown || {};
+        const reroutes = data.reroute_options || [];
+        const totalScore = data.disruption_score ?? 0;
+        let html = `<div class="risk-grid">
+      <div class="risk-item"><div class="risk-label">Overall Risk Score</div><div class="risk-value" style="color:${totalScore >= 70 ? "var(--red)" : totalScore >= 50 ? "var(--amber)" : "var(--green)"}">${Math.round(totalScore)}</div><div class="risk-bar"><div class="risk-bar-fill" style="width:${totalScore}%;background:${totalScore >= 70 ? "var(--red)" : totalScore >= 50 ? "var(--amber)" : "var(--green)"}"></div></div></div>
+      <div class="risk-item"><div class="risk-label">Weather Risk</div><div class="risk-value">${Math.round(breakdown.weather || 0)}</div><div class="risk-bar"><div class="risk-bar-fill" style="width:${breakdown.weather || 0}%;background:var(--amber)"></div></div></div>
+      <div class="risk-item"><div class="risk-label">Port Congestion</div><div class="risk-value">${Math.round(breakdown.port_congestion || 0)}</div><div class="risk-bar"><div class="risk-bar-fill" style="width:${breakdown.port_congestion || 0}%;background:var(--amber)"></div></div></div>
+      <div class="risk-item"><div class="risk-label">Position Risk</div><div class="risk-value">${Math.round(breakdown.position_risk || 0)}</div><div class="risk-bar"><div class="risk-bar-fill" style="width:${breakdown.position_risk || 0}%;background:var(--green)"></div></div></div>
+      <div class="risk-item"><div class="risk-label">Geopolitical</div><div class="risk-value">${Math.round(breakdown.geopolitical || 0)}</div><div class="risk-bar"><div class="risk-bar-fill" style="width:${breakdown.geopolitical || 0}%;background:var(--green)"></div></div></div>
+    </div>`;
+        if (reroutes.length > 0) {
+          html += `<div class="reroutes-section"><h3 style="font-family:Bebas Neue;font-size:1.8rem;margin-bottom:1rem;color:var(--cyan)">REROUTE OPTIONS</h3>`;
+          reroutes.forEach((route, idx) => {
+            const isRec = idx === 0;
+            const delay = route.estimated_delay_hours ?? 0;
+            const costDelta = route.cost_delta_usd ?? 0;
+            const carbonDelta = route.carbon_delta_kg ?? 0;
+            html += `<div class="reroute-card ${isRec ? "recommended" : ""}">
+          <div class="reroute-header"><div class="reroute-title">${escapeHtml(route.route_name || route.via || "Alternate route")}</div>${isRec ? '<div class="reroute-badge">Recommended</div>' : ""}</div>
+          <div class="reroute-metrics">
+            <div class="metric"><div class="metric-label">Delay</div><div class="metric-value ${delay > 0 ? "negative" : "positive"}">${delay > 0 ? "+" : ""}${Math.round(delay)}h</div></div>
+            <div class="metric"><div class="metric-label">Cost Impact</div><div class="metric-value ${costDelta > 0 ? "negative" : "positive"}">${costDelta > 0 ? "+" : ""}$${Math.abs(Math.round(costDelta)).toLocaleString()}</div></div>
+            <div class="metric"><div class="metric-label">Carbon Δ</div><div class="metric-value ${carbonDelta > 0 ? "negative" : "positive"}">${carbonDelta > 0 ? "+" : ""}${Math.round(carbonDelta)} kg</div></div>
+          </div>
+          ${isRec ? `<button class="btn btn-accept" onclick="acceptReroute('${escapeHtml(route.route_name)}')">Accept Reroute</button>` : ""}
+        </div>`;
+          });
+          html += `</div>`;
+        } else if (totalScore >= 70) {
+          html += `<div class="loading" style="margin-top:1rem; color:var(--amber)">⚠️ No automatic reroute generated — manual intervention advised.</div>`;
+        }
+        document.getElementById("detailContent").innerHTML = html;
+      }
+
+      window.acceptReroute = async function (routeName) {
+        if (!selectedShipId || !routeName) return;
+        if (
+          !confirm(
+            `Accept reroute: "${routeName}"? This will update vessel status.`,
+          )
+        )
+          return;
+        try {
+          const res = await fetch(
+            `${API_BASE}/shipments/${selectedShipId}/accept-reroute`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ route_name: routeName }),
+            },
+          );
+          if (!res.ok) throw new Error("Accept failed");
+          const result = await res.json();
+          alert(result.message || "Reroute accepted successfully");
+          await fetchShipments();
+          // refresh detail panel with latest cached analysis or basic info
+          if (selectedShipId) selectShip(selectedShipId);
+        } catch (err) {
+          alert("Failed to accept reroute: " + err.message);
+        }
+      };
+
+      // ---------- MAP DRAWING ----------
+      function drawMap(ships) {
+        const canvas = document.getElementById("mapCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const container = canvas.parentElement;
+        const w = container.clientWidth - 32;
+        const h = 420;
+        canvas.width = w;
+        canvas.height = h;
+        const W = w,
+          H = h;
+        ctx.fillStyle = "#040D1A";
+        ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = "rgba(0,229,255,.05)";
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 60) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+          ctx.stroke();
+        }
+        for (let y = 0; y < H; y += 60) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+        function ll(lon, lat) {
+          return { x: ((lon + 180) / 360) * W, y: ((90 - lat) / 180) * H };
+        }
+        const mainRoute = [
+          [114.06, 22.54],
+          [120, 24],
+          [130, 27],
+          [145, 31],
+          [160, 35],
+          [175, 37],
+          [-175, 38],
+          [-160, 37],
+          [-145, 35.5],
+          [-130, 34.5],
+          [-118.2, 33.75],
+        ];
+        ctx.beginPath();
+        mainRoute.forEach((p, i) => {
+          const pt = ll(p[0], p[1]);
+          i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.strokeStyle = "rgba(0,255,159,.5)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        const altRoute = [
+          [-160, 37],
+          [-150, 41],
+          [-135, 45],
+          [-122.3, 47.6],
+        ];
+        ctx.beginPath();
+        altRoute.forEach((p, i) => {
+          const pt = ll(p[0], p[1]);
+          i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.strokeStyle = "rgba(0,229,255,.8)";
+        ctx.setLineDash([8, 8]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        const ports = [
+          [114.06, 22.54, "Shenzhen"],
+          [-118.2, 33.75, "Long Beach"],
+          [-122.3, 47.6, "Seattle"],
+        ];
+        ports.forEach((p) => {
+          const pos = ll(p[0], p[1]);
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = "#00E5FF";
+          ctx.fill();
+          ctx.fillStyle = "rgba(0,229,255,.9)";
+          ctx.font = "9px Space Mono";
+          ctx.fillText(p[2], pos.x + 8, pos.y + 4);
+        });
+        if (ships && ships.length) {
+          ships.forEach((ship) => {
+            if (
+              !ship.current_position ||
+              typeof ship.current_position.lon === "undefined"
+            )
+              return;
+            const pos = ll(
+              ship.current_position.lon,
+              ship.current_position.lat,
+            );
+            const score = ship.disruption_score ?? 0;
+            let color = "#00FF9F";
+            if (score >= 70) color = "#FF4B6E";
+            else if (score >= 50) color = "#FF8C42";
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            const pulse = 0.4 + 0.4 * Math.sin(Date.now() * 0.004);
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 10 + pulse * 5, 0, Math.PI * 2);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.2;
+            ctx.globalAlpha = pulse * 0.6;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+            ctx.font = "bold 9px 'Space Mono'";
+            ctx.fillStyle = color;
+            ctx.fillText(ship.vessel_name, pos.x + 10, pos.y - 8);
+          });
+        }
+      }
+
+      function startMapAnimation() {
+        function animate() {
+          if (globalShipments) drawMap(globalShipments);
+          requestAnimationFrame(animate);
+        }
+        animate();
+      }
+
+      // full refresh without destroying detail panel
+      window.refreshData = async function (preserveSelection = true) {
+        await fetchDashboardSummary();
+        await fetchShipments();
+        if (preserveSelection && selectedShipId) {
+          // re-apply selection and restore cached analysis if available
+          const shipExists = globalShipments.some(
+            (s) => s.id === selectedShipId,
+          );
+          if (shipExists) {
+            renderShipmentsList(globalShipments);
+            const cached = cachedAnalysis[selectedShipId];
+            if (cached && Date.now() - cached.timestamp < 10 * 60 * 1000) {
+              renderAnalysisResult(cached.data);
+            } else {
+              // fallback to basic info but keep panel active
+              const ship = globalShipments.find((s) => s.id === selectedShipId);
+              if (ship) {
+                const score = ship.disruption_score ?? 0;
+                document.getElementById("detailContent").innerHTML = `
+              <div class="risk-grid"><div class="risk-item"><div class="risk-label">Overall Risk Score</div><div class="risk-value" style="color:${score >= 70 ? "var(--red)" : score >= 50 ? "var(--amber)" : "var(--green)"}">${Math.round(score)}</div><div class="risk-bar"><div class="risk-bar-fill" style="width:${score}%;background:${score >= 70 ? "var(--red)" : score >= 50 ? "var(--amber)" : "var(--green)"}"></div></div></div></div>
+              <div style="margin-top:1rem"><button class="btn btn-analyze" onclick="analyzeShipment()">Run Analysis</button></div>`;
+              }
+            }
+          } else {
+            selectedShipId = null;
+            document.getElementById("detailPanel").classList.remove("active");
+          }
+        }
+      };
+
+      async function init() {
+        await refreshData(false);
+        startMapAnimation();
+        setInterval(() => refreshData(true), 30000); // auto-refresh every 30s, preserving detail panel
+      }
+      init();
+    </script>
+  </body>
+</html>
